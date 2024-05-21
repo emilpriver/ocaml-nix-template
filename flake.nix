@@ -46,6 +46,14 @@
                 inputs'.riot.packages.default
               ];
               src = ./.;
+              buildPhase = ''
+                dune build
+              '';
+              doCheck = true;
+              installPhase = ''
+                mkdir $out
+                cp _build/default/bin/main.exe $out
+              '';
             };
             test = pkgs.stdenv.mkDerivation {
               name = "ocaml-test";
@@ -70,6 +78,18 @@
                 touch $out/coverage.txt
                 echo "I am the coverage of the test" > $out/coverage.txt 
               '';
+            };
+            dockerImage = pkgs.dockerTools.buildLayeredImage {
+              name = "nix-template";
+              tag = "0.0.1+dev";
+              contents = [ self'.packages.default ocamlPackages.ounit2 ];
+              config = {
+                Cmd = [ "${self'.packages.default}/bin/main.exe" ];
+                ExposedPorts = { "8000/tcp" = { }; };
+                Env = [
+                  ("GITHUB_SHA=123123")
+                ];
+              };
             };
           };
           formatter = pkgs.nixpkgs-fmt;
