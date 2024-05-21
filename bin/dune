@@ -1,0 +1,4 @@
+(executable
+ (public_name nix_template)
+ (name main)
+ (libraries riot))
