@@ -3,10 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nix-ocaml/nix-overlays";
-    riot = {
-      url = "github:emilpriver/riot";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = inputs@{ flake-parts,nixpkgs, ... }:
@@ -15,7 +11,7 @@
       perSystem = { config, self', inputs', pkgs, system, ... }:
         let
           pkgs = nixpkgs.legacyPackages."${system}".extend (self: super: {
-            ocamlPackages = super.ocaml-ng.ocamlPackages_5_2;
+            ocamlPackages = super.ocaml-ng.ocamlPackages_5_1;
           });
           inherit (pkgs) ocamlPackages mkShell;
           inherit (ocamlPackages) buildDunePackage;
@@ -42,39 +38,22 @@
             };
           };
           packages = {
-            randomconv = buildDunePackage {
-              version = "0.2.0";
-              pname = "randomconv";
-              src = pkgs.fetchFromGitHub {
-                owner = "hannesm";
-                repo = "randomconv";
-                rev = "b2ce656d09738d676351f5a1c18aff0ff37a7dcc";
-                hash = "sha256-KIvx/UNtPTg0EqfwuJgzSCtr6RgKIXK6yv9QkUUHbJk=";
-              };
-              dontDetectOcamlConflicts = true;
-            };
-            random = buildDunePackage {
-              version = "0.0.1";
-              pname = "random";
-              src = pkgs.fetchFromGitHub {
-                owner = "leostera";
-                repo = "random";
-                rev = "abb07c253dbc208219ac1983b34c78dab5fe93fd";
-                hash = "sha256-dcJDuWE3qLEanu+TBBSeJPxxQvAN9eq88R5W3XMEGiA=";
-              };
-              propagatedBuildInputs = with ocamlPackages; [
-                mirage-crypto-rng
-                mirage-crypto
-                self'.packages.randomconv
-              ];
-              dontDetectOcamlConflicts = true;
-            };
+            #randomconv = buildDunePackage {
+            #  version = "0.2.0";
+            #  pname = "randomconv";
+            #  src = pkgs.fetchFromGitHub {
+            #    owner = "hannesm";
+            #    repo = "randomconv";
+            #    rev = "b2ce656d09738d676351f5a1c18aff0ff37a7dcc";
+            #    hash = "sha256-KIvx/UNtPTg0EqfwuJgzSCtr6RgKIXK6yv9QkUUHbJk=";
+            #  };
+            #  dontDetectOcamlConflicts = true;
+            # };
             default = buildDunePackage {
               inherit version;
               pname = "nix_template";
               buildInputs = [
-                self'.packages.random
-                inputs'.riot.packages.default
+              # self'.packages.random
               ];
               src = ./.;
               buildPhase = ''
