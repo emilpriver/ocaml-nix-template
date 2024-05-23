@@ -2,18 +2,21 @@
   description = "Nix and Ocaml template";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nix-ocaml/nix-overlays";
     riot = {
       url = "github:emilpriver/riot";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs = inputs@{ flake-parts,nixpkgs, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
       perSystem = { config, self', inputs', pkgs, system, ... }:
         let
+          pkgs = nixpkgs.legacyPackages."${system}".extend (self: super: {
+            ocamlPackages = super.ocaml-ng.ocamlPackages_5_2;
+          });
           inherit (pkgs) ocamlPackages mkShell;
           inherit (ocamlPackages) buildDunePackage;
           version = "0.0.1+dev";
